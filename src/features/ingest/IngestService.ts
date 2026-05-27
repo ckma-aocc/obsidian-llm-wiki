@@ -168,83 +168,164 @@ export class IngestService {
         role: "user",
         content: [
             "Return valid JSON only.",
-            
-            "The JSON must contain exactly two keys: entities and concepts.",
+  
+            "The JSON must contain exactly two keys:",
+            "- entities",
+            "- concepts",
             
             "Each value must be an array of objects with:",
             "- title",
             "- content",
             "- tags",
             
-            "The goal is retrieval-oriented wiki generation.",
+            "You are generating semantic wiki knowledge nodes.",
             
-            "Focus on reusable semantic concepts, technical entities, and retrieval precision.",
+            "The goal is to compile the source into reusable retrieval-oriented wiki pages.",
             
-            "Tags are for semantic retrieval and graph linking.",
+            "Entities and concepts have different purposes.",
             
-            "Do NOT generate broad topic labels or generic keywords.",
+            "ENTITY DEFINITION:",
+            "Entities are named systems, services, APIs, components, middleware, protocols, SDKs, infrastructure elements, organizations, or products.",
+            
+            "CONCEPT DEFINITION:",
+            "Concepts are technical ideas, mechanisms, workflows, behaviors, architectural patterns, abstractions, or implementation strategies.",
+            
+            "Generate rich markdown wiki content.",
+            
+            "Do NOT generate one-line summaries.",
+            
+            "Each page should contain useful standalone knowledge.",
+            
+            "Content should explain:",
+            "- what it is",
+            "- why it exists",
+            "- how it is used",
+            "- important behaviors",
+            "- constraints or caveats",
+            "- implementation or operational details when relevant",
+            
+            "Use structured markdown sections when appropriate:",
+            "- Purpose",
+            "- Usage",
+            "- Behavior",
+            "- Requirements",
+            "- Notes",
+            "- Example",
+            "- Related",
+            
+            "Use wikilinks for related concepts or entities when strongly relevant.",
             
             "Prefer canonical technical terminology.",
             
-            "Prefer noun phrases and explicit concepts.",
+            "Do not invent unsupported information.",
             
-            "Avoid vague tags such as:",
+            "Avoid generic explanations.",
+            
+            "Avoid generic tags such as:",
             "- advanced",
             "- optimization",
             "- architecture",
             "- technology",
             "- important-concept",
             
-            "Tags should represent:",
-            "- entities",
-            "- technical concepts",
-            "- methods",
-            "- protocols",
-            "- systems",
-            "- tasks",
+            "Tags are for semantic retrieval and graph linking.",
+            
+            "Tags must represent reusable technical concepts, systems, methods, protocols, or tasks.",
+            
+            "Prefer noun phrases and explicit technical terminology.",
             
             "Each tags array should contain 3 to 5 highly reusable retrieval-oriented tags.",
             
-            "Use kebab-case.",
-            
-            "Do not invent concepts not explicitly supported by the source.",
-            
-            "Content should be concise markdown.",
-            
-            "Use wikilinks only when strongly relevant.",
+            "Use kebab-case tags.",
             
             "Think about:",
             "\"What future search queries should retrieve this page?\"",
+            
+            "Pages should resemble technical wiki knowledge nodes rather than summaries.",
             
             `Source title: ${sourceTitle}`,
             
             `Source summary:\n${sourceSummary.slice(0, 6000)}`,
             
             "Example:",
+            
             JSON.stringify({
                 entities: [
                 {
-                    title: "FlashAttention",
-                    content: "Memory-efficient attention optimization for transformer inference.",
+                    title: "Account Middleware",
+                    content: `# Account Middleware
+
+            Account Middleware 是帳號中台 API 的中介服務層，負責統一處理身份驗證、請求追蹤與帳號相關流程。
+
+            ## Purpose
+
+            提供集中式帳號服務與 API 存取控制。
+
+            ## Responsibilities
+
+            - token validation
+            - request tracing
+            - session management
+            - authentication flow handling
+
+            ## Request Requirements
+
+            所有 API 請求需包含 [[X-Request-ID]] 以利錯誤追蹤。
+
+            ## Related
+
+            - [[X-Request-ID]]
+            - [[Authentication Token]]
+            - [[Request Tracing]]`,
                     tags: [
-                    "flashattention",
-                    "transformer-inference",
-                    "attention-optimization",
-                    "cuda-kernel",
-                    "memory-bandwidth"
+                    "account-middleware",
+                    "authentication-service",
+                    "request-tracing",
+                    "api-gateway",
+                    "session-management"
                     ]
                 }
                 ],
+                
                 concepts: [
                 {
-                    title: "KV Cache",
-                    content: "Technique for caching transformer key/value states during autoregressive decoding.",
+                    title: "X-Request-ID",
+                    content: `# X-Request-ID
+
+            X-Request-ID 是 HTTP 請求追蹤標頭，用於 API request tracing 與問題排查。
+
+            ## Purpose
+
+            每個 API 請求都應攜帶唯一識別值，
+            方便於分散式系統與伺服器日誌中追蹤請求流程。
+
+            ## Usage
+
+            \`\`\`http
+            X-Request-ID: <random-id>
+            \`\`\`
+
+            ## Behavior
+
+            - 每次請求應使用新的唯一值
+            - 常用於 log correlation
+            - 可協助跨服務追蹤 request flow
+
+            ## Notes
+
+            建議使用 UUID 作為 request identifier。
+
+            ## Related
+
+            - [[Request Tracing]]
+            - [[Correlation ID]]
+            - [[Distributed Logging]]`,
                     tags: [
-                    "kv-cache",
-                    "autoregressive-decoding",
-                    "transformer-inference",
-                    "token-generation",
-                    "attention-cache"
+                    "x-request-id",
+                    "request-tracing",
+                    "correlation-id",
+                    "http-header",
+                    "distributed-logging"
                     ]
                 }
                 ]
