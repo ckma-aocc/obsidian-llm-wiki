@@ -1,0 +1,9 @@
+{
+  "id": "obsidian-llm-wiki",
+  "name": "Obsidian LLM Wiki",
+  "version": "0.1.0",
+  "minAppVersion": "1.4.0",
+  "description": "Build and maintain a persistent wiki using LLMs.",
+  "author": "Ck Ma",
+  "isDesktopOnly": false
+}

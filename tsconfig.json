@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
+    "inlineSourceMap": true,
+    "inlineSources": true,
+    "module": "ESNext",
+    "target": "ES2018",
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "bundler",
+    "strict": true,
+    "lib": ["ES2018", "DOM"],
+    "types": ["node", "jest"]
+  },
+  "include": ["src/**/*.ts", "__mocks__/**/*.ts", "__tests__/**/*.ts"],
+  "exclude": ["node_modules"]
+}
