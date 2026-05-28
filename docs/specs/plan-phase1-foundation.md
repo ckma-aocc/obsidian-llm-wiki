@@ -6,6 +6,7 @@
 - Provider abstraction, settings, schema loading, and core type definitions are in production use.
 - Runtime behavior now includes startup creation of `rawSourcesPath` when missing.
 - Settings UI now uses sectioned categories (Provider, Vault Folders, Schema/Relations, Ingest, Lint, Context) for faster navigation.
+- Ingest settings now include `Output language` (`zh-TW` / `en`) for downstream wiki generation control.
 - API Key field in settings is now masked by default with eye-toggle show/hide control; each settings-page open resets to masked mode.
 - Actual scripts differ slightly from early draft examples (build/test scripts and dependency versions follow current repository files).
 

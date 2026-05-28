@@ -7,6 +7,7 @@
 - Ingest now creates/updates source + derived entity/concept pages and writes structured log details.
 - Derived entity/concept generation now uses a structured JSON-only prompt: the model returns `entities` and `concepts` separately, and concept pages are written as reusable technical knowledge nodes rather than one-line summaries.
 - Generated concept content now prefers structured sections such as Purpose, Usage, Behavior, Requirements, Notes, Example, and Related.
+- Ingest now adds an output language setting (`outputLanguage`), allowing users to choose between Traditional Chinese and English, and injects language instructions into the source + derived prompt to reduce language mixing.
 - Broken wikilink cleanup is implemented both during ingest (touched pages) and via `/clean-links` for whole-wiki cleanup.
 - Auto-ingest remains create-event based with debounce, and only triggers for files under `rawSourcesPath`.
 - Generated wiki frontmatter tags are no longer hard-coded; tags are LLM-driven with enforced 3 to 10 range.
@@ -17,7 +18,7 @@
 
 **Architecture:** `FileParser` dispatches to format-specific parsers (all dynamic imports). `IngestService` orchestrates: parse → source summary prompt → derived entity/concept generation prompt → write wiki page(s) → update `wiki/index.md` and `wiki/log.md`. `WikiManager` owns all vault write operations so tests can mock a single boundary. `AutoWatcher` subscribes to `vault.on('create')` with 2-second debounce.
 
-**Prompt behavior notes:** The derived-page prompt is intentionally stricter than the source-summary prompt. It demands JSON-only output, separates entities from concepts, and asks the model to emit durable technical wiki pages with reusable retrieval tags and structured markdown sections. This prevents concept pages from collapsing into shallow summaries and matches the current `IngestService` implementation.
+**Prompt behavior notes:** The derived-page prompt is intentionally stricter than the source-summary prompt. It demands JSON-only output, separates entities from concepts, and asks the model to emit durable technical wiki pages with reusable retrieval tags and structured markdown sections. This prevents concept pages from collapsing into shallow summaries and matches the current `IngestService` implementation. Prompt assembly now also includes language instruction from settings (`outputLanguage`: `zh-TW` or `en`) so source/entity/concept pages are generated in the selected language.
 
 **Tech Stack:** TypeScript 5, `pdfjs-dist`, `mammoth`, `xlsx` (SheetJS), `pptx-to-text`, Obsidian Plugin API, Jest + ts-jest
 

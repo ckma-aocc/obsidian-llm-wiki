@@ -19,6 +19,7 @@
 - **支援關聯圖**：LLM 在 Ingest、Query Save、Lint 時自動識別頁面間的語意關係，寫入 YAML frontmatter，透過 Obsidian 原生 Graph View 呈現；提供 `/relate` 指令手動觸發關係重分析
 - 支援多個 LLM Provider（OpenAI、Anthropic、Ollama 等），使用者可在設定頁切換
 - 支援多種原始文件格式：`.md`、`.pdf`、`.png`/`.jpg`、`.docx`、`.xlsx`、`.pptx`
+- 支援 Ingest 輸出語言設定：可選繁體中文或英文，統一 source/entity/concept 產出語系
 - Session 管理：預設開啟新 Session，保留所有歷史 Session，可選擇繼續舊 Session
 - Schema 可配置：內建預設，支援 `WIKI_SCHEMA.md` 或設定頁覆寫
 
@@ -78,6 +79,7 @@
 - **US-31** 身為使用者，我希望設定頁有清楚的分類區塊（例如 Provider、Vault Folders、Schema、Ingest、Lint、Context），方便快速定位設定項目
 - **US-32** 身為使用者，API Key 在設定頁預設應以遮罩（星號）顯示，避免 shoulder surfing 或螢幕錄影時外洩
 - **US-33** 身為使用者，我可以透過眼睛圖示切換 API Key 明碼/遮罩顯示；再次點擊可切回遮罩
+- **US-34** 身為使用者，我可以在設定頁選擇 Ingest 產生頁面的語言（繁體中文 / 英文），避免輸出語系混用
 
 ---
 
@@ -127,6 +129,7 @@ interface LLMWikiSettings {
   // Ingest
   autoIngest: boolean;          // default: false
   autoIngestDebounceMs: number; // default: 3000
+  outputLanguage: 'zh-TW' | 'en'; // default: 'zh-TW'
 
   // Schema
   systemPrompt: string;         // built-in default, user-overridable
@@ -216,6 +219,7 @@ System prompt（schema）
 - JSON 必須只包含 `entities` 與 `concepts` 兩個 key，每個 item 都要有 `title`、`content`、`tags`。
 - `concept` 頁面不是簡短摘要，而是可獨立閱讀的技術 wiki knowledge node，內容需包含具體說明、用途、行為、限制與相關連結。
 - prompt 會明確要求 LLM 使用結構化 markdown，例如 `Purpose`、`Usage`、`Behavior`、`Requirements`、`Notes`、`Example`、`Related`。
+- prompt 會注入語言指示，要求模型以設定語言輸出頁面內容；目前支援 `zh-TW`（繁體中文）與 `en`（英文）。
 - tags 由 LLM 產生，必須偏向可檢索的技術詞彙，使用 kebab-case，且每頁維持 3~5 個高重用度 tag。
 - 不可編造來源未支持的資訊；頁面內容需以 source summary 為依據，避免 generic 標籤或空泛概念。
 

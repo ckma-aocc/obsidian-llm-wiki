@@ -23,6 +23,15 @@ type DerivedWikiPages = {
 export class IngestService {
   constructor(private vault: Vault, private settings: LLMWikiSettings) {}
 
+  private getOutputLanguageLabel(): string {
+    return this.settings.outputLanguage === "en" ? "English" : "Traditional Chinese (zh-TW)";
+  }
+
+  private getOutputLanguageInstruction(): string {
+    const label = this.getOutputLanguageLabel();
+    return `Write all generated wiki page content in ${label}. Keep proper nouns, product names, and APIs in their canonical names.`;
+  }
+
   async cleanBrokenWikilinksInWiki(onProgress?: (msg: string) => void): Promise<{ scanned: number; updated: number }> {
     const paths = this.vault
       .getFiles()
@@ -115,7 +124,12 @@ export class IngestService {
       { role: "system", content: schema.systemPrompt, timestamp: "" },
       {
         role: "user",
-        content: `Summarize this source into a concise wiki page with wikilink references where appropriate.\n\nSource file: ${file.path}\n\n${content}`,
+        content: [
+          "Summarize this source into a concise wiki page with wikilink references where appropriate.",
+          this.getOutputLanguageInstruction(),
+          `Source file: ${file.path}`,
+          content
+        ].join("\n\n"),
         timestamp: ""
       }
     ])) {
@@ -168,6 +182,8 @@ export class IngestService {
         role: "user",
         content: [
             "Return valid JSON only.",
+
+            this.getOutputLanguageInstruction(),
   
             "The JSON must contain exactly two keys:",
             "- entities",

@@ -190,6 +190,20 @@ export class LLMWikiSettingsTab extends PluginSettingTab {
     const ingestSection = this.createSection(containerEl, "Ingest", "Configure automatic ingestion behavior and source monitoring.");
 
     new Setting(ingestSection)
+      .setName("Output language")
+      .setDesc("Language used for generated source/entity/concept wiki pages.")
+      .addDropdown((d) =>
+        d
+          .addOption("zh-TW", "Traditional Chinese")
+          .addOption("en", "English")
+          .setValue(this.plugin.settings.outputLanguage)
+          .onChange(async (v) => {
+            this.plugin.settings.outputLanguage = v as "zh-TW" | "en";
+            await this.plugin.saveSettings();
+          })
+      );
+
+    new Setting(ingestSection)
       .setName("Auto ingest")
       .addToggle((toggle) =>
         toggle.setValue(this.plugin.settings.autoIngest).onChange(async (v) => {

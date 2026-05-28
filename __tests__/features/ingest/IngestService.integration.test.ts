@@ -153,7 +153,7 @@ describe("IngestService integration", () => {
           yield "{}";
           return;
         }
-        if (user.includes("exactly two keys: entities and concepts")) {
+        if (user.includes("The JSON must contain exactly two keys:")) {
           yield '{"entities":[{"title":"Authorization Middleware","content":"Entity page content"}],"concepts":[{"title":"JWT Verification","content":"Concept page content"}]}';
           return;
         }
@@ -223,7 +223,7 @@ describe("IngestService integration", () => {
           yield "{}";
           return;
         }
-        if (user.includes("exactly two keys: entities and concepts")) {
+        if (user.includes("The JSON must contain exactly two keys:")) {
           yield '{"entities":[{"title":"AuthorizationEntity","content":"Entity details"}],"concepts":[]}';
           return;
         }
@@ -270,5 +270,69 @@ describe("IngestService integration", () => {
     expect(files["wiki/sources/source.md"]).toContain("[[AuthorizationEntity]]");
     expect(files["wiki/sources/source.md"]).not.toContain("[[JWT]]");
     expect(files["wiki/sources/source.md"]).toContain("unknown JWT");
+  });
+
+  it("passes selected output language into source and derived generation prompts", async () => {
+    const { ProviderFactory } = jest.requireMock("../../../src/providers/ProviderFactory");
+    const { SchemaLoader } = jest.requireMock("../../../src/schema/SchemaLoader");
+
+    const seenUserPrompts: string[] = [];
+    ProviderFactory.create.mockReturnValue({
+      chat: async function* (messages: any[]) {
+        const user = String(messages[1]?.content ?? "");
+        seenUserPrompts.push(user);
+        if (user.includes("exactly two keys")) {
+          yield '{"entities":[],"concepts":[]}';
+          return;
+        }
+        if (user.includes("Return only JSON")) {
+          yield "{}";
+          return;
+        }
+        yield "Generated summary content";
+      }
+    });
+
+    SchemaLoader.load.mockResolvedValue({
+      systemPrompt: "schema prompt",
+      pageTypes: ["summary", "entity", "concept"],
+      relationTypes: ["related"],
+      defaultPageType: "summary"
+    });
+
+    const { vault } = createFakeVault({
+      "raw/source.md": "# Source\nImportant input"
+    });
+
+    const service = new IngestService(
+      vault,
+      {
+        provider: "openai",
+        apiKey: "x",
+        model: "m",
+        baseUrl: "",
+        rawSourcesPath: "raw",
+        wikiPath: "wiki",
+        sessionsPath: ".llm-wiki/sessions",
+        wikiSubdirs: ["sources", "entities", "concepts", "analyses"],
+        autoIngest: false,
+        autoIngestDebounceMs: 2000,
+        useWikiSchemaFile: false,
+        systemPrompt: "",
+        defaultPageTypeOverride: "",
+        relationTypesOverride: "",
+        outputLanguage: "en",
+        lintSchedule: "off",
+        contextWindowSize: 20,
+        maxMessagesPerSession: 500
+      } as any
+    );
+
+    await service.ingestByPath("raw/source.md", true, () => undefined);
+
+    const languageInstruction = "Write all generated wiki page content in English.";
+    expect(seenUserPrompts.some((p) => p.includes(languageInstruction))).toBe(true);
+    expect(seenUserPrompts.some((p) => p.includes("Summarize this source into a concise wiki page"))).toBe(true);
+    expect(seenUserPrompts.some((p) => p.includes("The JSON must contain exactly two keys:"))).toBe(true);
   });
 });

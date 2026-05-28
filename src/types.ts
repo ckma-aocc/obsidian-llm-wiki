@@ -1,5 +1,6 @@
 export type ProviderType = "openai" | "anthropic" | "ollama" | "gemini" | "custom";
 export type LintSchedule = "off" | "daily" | "weekly";
+export type OutputLanguage = "zh-TW" | "en";
 
 export interface ProviderConfig {
   provider: ProviderType;
@@ -44,6 +45,7 @@ export interface LLMWikiSettings {
   systemPrompt: string;
   defaultPageTypeOverride: string;
   relationTypesOverride: string;
+  outputLanguage: OutputLanguage;
   lintSchedule: LintSchedule;
   lintTimeOfDay: string;
   lintCatchUpOnStartup: boolean;

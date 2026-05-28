@@ -132,6 +132,7 @@ var init_Settings = __esm({
       systemPrompt: "You are an assistant that maintains a structured Obsidian wiki.",
       defaultPageTypeOverride: "",
       relationTypesOverride: "",
+      outputLanguage: "zh-TW",
       lintSchedule: "off",
       lintTimeOfDay: "09:00",
       lintCatchUpOnStartup: false,
@@ -81989,6 +81990,13 @@ var init_IngestService = __esm({
         this.vault = vault;
         this.settings = settings;
       }
+      getOutputLanguageLabel() {
+        return this.settings.outputLanguage === "en" ? "English" : "Traditional Chinese (zh-TW)";
+      }
+      getOutputLanguageInstruction() {
+        const label = this.getOutputLanguageLabel();
+        return `Write all generated wiki page content in ${label}. Keep proper nouns, product names, and APIs in their canonical names.`;
+      }
       async cleanBrokenWikilinksInWiki(onProgress) {
         const paths = this.vault.getFiles().filter((f) => f.path.startsWith(`${this.settings.wikiPath}/`) && f.extension === "md").map((f) => f.path);
         if (onProgress) {
@@ -82062,11 +82070,12 @@ var init_IngestService = __esm({
           { role: "system", content: schema.systemPrompt, timestamp: "" },
           {
             role: "user",
-            content: `Summarize this source into a concise wiki page with wikilink references where appropriate.
-
-Source file: ${file.path}
-
-${content}`,
+            content: [
+              "Summarize this source into a concise wiki page with wikilink references where appropriate.",
+              this.getOutputLanguageInstruction(),
+              `Source file: ${file.path}`,
+              content
+            ].join("\n\n"),
             timestamp: ""
           }
         ])) {
@@ -82106,6 +82115,7 @@ ${content}`,
             role: "user",
             content: [
               "Return valid JSON only.",
+              this.getOutputLanguageInstruction(),
               "The JSON must contain exactly two keys:",
               "- entities",
               "- concepts",
@@ -82782,6 +82792,12 @@ var LLMWikiSettingsTab = class extends import_obsidian.PluginSettingTab {
       })
     );
     const ingestSection = this.createSection(containerEl, "Ingest", "Configure automatic ingestion behavior and source monitoring.");
+    new import_obsidian.Setting(ingestSection).setName("Output language").setDesc("Language used for generated source/entity/concept wiki pages.").addDropdown(
+      (d) => d.addOption("zh-TW", "Traditional Chinese").addOption("en", "English").setValue(this.plugin.settings.outputLanguage).onChange(async (v) => {
+        this.plugin.settings.outputLanguage = v;
+        await this.plugin.saveSettings();
+      })
+    );
     new import_obsidian.Setting(ingestSection).setName("Auto ingest").addToggle(
       (toggle) => toggle.setValue(this.plugin.settings.autoIngest).onChange(async (v) => {
         this.plugin.settings.autoIngest = v;

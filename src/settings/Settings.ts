@@ -83,6 +83,7 @@ export const DEFAULT_SETTINGS: LLMWikiSettings = {
   systemPrompt: "You are an assistant that maintains a structured Obsidian wiki.",
   defaultPageTypeOverride: "",
   relationTypesOverride: "",
+  outputLanguage: "zh-TW",
   lintSchedule: "off",
   lintTimeOfDay: "09:00",
   lintCatchUpOnStartup: false,
