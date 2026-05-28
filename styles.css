@@ -153,3 +153,46 @@
   color: var(--text-muted);
   font-size: 12px;
 }
+
+.llm-wiki-settings-root {
+  max-width: 920px;
+}
+
+.llm-wiki-settings-title {
+  margin: 0 0 14px;
+  font-size: 1.35em;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.llm-wiki-settings-hint {
+  margin-bottom: 16px;
+}
+
+.llm-wiki-settings-section {
+  margin: 18px 0 22px;
+  padding: 14px 16px 6px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 14px;
+  background: var(--background-secondary);
+}
+
+.llm-wiki-settings-section-title {
+  margin: 0 0 4px;
+  font-size: 1.02em;
+  font-weight: 700;
+}
+
+.llm-wiki-settings-section-desc {
+  margin-bottom: 8px;
+}
+
+.llm-wiki-settings-section .setting-item {
+  border-top: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.llm-wiki-settings-section .setting-item:first-of-type {
+  margin-top: 4px;
+}

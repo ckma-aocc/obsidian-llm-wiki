@@ -5,13 +5,15 @@
 - Phase 1 foundation is implemented and passing tests.
 - Provider abstraction, settings, schema loading, and core type definitions are in production use.
 - Runtime behavior now includes startup creation of `rawSourcesPath` when missing.
+- Settings UI now uses sectioned categories (Provider, Vault Folders, Schema/Relations, Ingest, Lint, Context) for faster navigation.
+- API Key field in settings is now masked by default with eye-toggle show/hide control; each settings-page open resets to masked mode.
 - Actual scripts differ slightly from early draft examples (build/test scripts and dependency versions follow current repository files).
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Bootstrap a working Obsidian plugin with TypeScript scaffold, settings UI, multi-provider LLM abstraction, and wiki schema system — the foundation that Plans 2–5 depend on.
+**Goal:** Bootstrap a working Obsidian plugin with TypeScript scaffold, sectioned settings UI, secure API key input behavior, multi-provider LLM abstraction, and wiki schema system — the foundation that Plans 2–5 depend on.
 
-**Architecture:** Single esbuild bundle (`src/main.ts` → `main.js`). `LLMProvider` interface with three concrete implementations (OpenAI, Anthropic, Ollama). `SchemaLoader` reads `WIKI_SCHEMA.md` or falls back to settings override → built-in default. All business logic is pure TypeScript; Obsidian API is mocked in tests via `__mocks__/obsidian.ts`.
+**Architecture:** Single esbuild bundle (`src/main.ts` → `main.js`). `LLMProvider` interface with three concrete implementations (OpenAI, Anthropic, Ollama). `SchemaLoader` reads `WIKI_SCHEMA.md` or falls back to settings override → built-in default. Settings are rendered as grouped sections, and the API key input defaults to masked (`password`) mode with explicit eye-toggle reveal control. All business logic is pure TypeScript; Obsidian API is mocked in tests via `__mocks__/obsidian.ts`.
 
 **Tech Stack:** TypeScript 5, esbuild, Jest + ts-jest, Obsidian Plugin API v1, `node-fetch` polyfill for SSE streaming
 

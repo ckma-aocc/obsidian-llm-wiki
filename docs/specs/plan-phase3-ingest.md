@@ -5,6 +5,8 @@
 - Phase 3 ingest pipeline is implemented and integrated with slash commands and context menu ingest.
 - `/ingest-all` failure handling is implemented with retry via `/ingest-all retry`.
 - Ingest now creates/updates source + derived entity/concept pages and writes structured log details.
+- Derived entity/concept generation now uses a structured JSON-only prompt: the model returns `entities` and `concepts` separately, and concept pages are written as reusable technical knowledge nodes rather than one-line summaries.
+- Generated concept content now prefers structured sections such as Purpose, Usage, Behavior, Requirements, Notes, Example, and Related.
 - Broken wikilink cleanup is implemented both during ingest (touched pages) and via `/clean-links` for whole-wiki cleanup.
 - Auto-ingest remains create-event based with debounce, and only triggers for files under `rawSourcesPath`.
 - Generated wiki frontmatter tags are no longer hard-coded; tags are LLM-driven with enforced 3 to 10 range.
@@ -13,7 +15,9 @@
 
 **Goal:** Build the full ingest pipeline — file parsers (md, pdf, docx, xlsx, pptx, image), `IngestService` that calls the LLM to write wiki pages, content-hash deduplication, File Explorer context menu, `/ingest`/`/reingest` slash commands, auto-watch for new files, and index/log updates.
 
-**Architecture:** `FileParser` dispatches to format-specific parsers (all dynamic imports). `IngestService` orchestrates: parse → LLM prompt → write wiki page(s) → update `wiki/index.md` and `wiki/log.md`. `WikiManager` owns all vault write operations so tests can mock a single boundary. `AutoWatcher` subscribes to `vault.on('create')` with 2-second debounce.
+**Architecture:** `FileParser` dispatches to format-specific parsers (all dynamic imports). `IngestService` orchestrates: parse → source summary prompt → derived entity/concept generation prompt → write wiki page(s) → update `wiki/index.md` and `wiki/log.md`. `WikiManager` owns all vault write operations so tests can mock a single boundary. `AutoWatcher` subscribes to `vault.on('create')` with 2-second debounce.
+
+**Prompt behavior notes:** The derived-page prompt is intentionally stricter than the source-summary prompt. It demands JSON-only output, separates entities from concepts, and asks the model to emit durable technical wiki pages with reusable retrieval tags and structured markdown sections. This prevents concept pages from collapsing into shallow summaries and matches the current `IngestService` implementation.
 
 **Tech Stack:** TypeScript 5, `pdfjs-dist`, `mammoth`, `xlsx` (SheetJS), `pptx-to-text`, Obsidian Plugin API, Jest + ts-jest
 

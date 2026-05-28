@@ -75,6 +75,9 @@
 - **US-21** 身為使用者，我可以在 Obsidian Settings → LLM Wiki 設定 Provider、API Key、Model、資料夾路徑、Schema
 - **US-22** 身為使用者，我可以在 vault 根目錄放置 `WIKI_SCHEMA.md` 覆寫 plugin 內建 schema
 - **US-23** 身為使用者，我可以在設定頁設定傳給 LLM 的滑動視窗大小（最新 N 則訊息，預設 20）
+- **US-31** 身為使用者，我希望設定頁有清楚的分類區塊（例如 Provider、Vault Folders、Schema、Ingest、Lint、Context），方便快速定位設定項目
+- **US-32** 身為使用者，API Key 在設定頁預設應以遮罩（星號）顯示，避免 shoulder surfing 或螢幕錄影時外洩
+- **US-33** 身為使用者，我可以透過眼睛圖示切換 API Key 明碼/遮罩顯示；再次點擊可切回遮罩
 
 ---
 
@@ -206,6 +209,15 @@ System prompt（schema）
   → IndexUpdater: 更新 index.md
   → LogAppender: Append log.md
 ```
+
+### 3.1 Derived Page Generation Rules
+
+- `entities` 與 `concepts` 會在 ingest 的衍生頁生成步驟中分開產生，並要求模型回傳 valid JSON only。
+- JSON 必須只包含 `entities` 與 `concepts` 兩個 key，每個 item 都要有 `title`、`content`、`tags`。
+- `concept` 頁面不是簡短摘要，而是可獨立閱讀的技術 wiki knowledge node，內容需包含具體說明、用途、行為、限制與相關連結。
+- prompt 會明確要求 LLM 使用結構化 markdown，例如 `Purpose`、`Usage`、`Behavior`、`Requirements`、`Notes`、`Example`、`Related`。
+- tags 由 LLM 產生，必須偏向可檢索的技術詞彙，使用 kebab-case，且每頁維持 3~5 個高重用度 tag。
+- 不可編造來源未支持的資訊；頁面內容需以 source summary 為依據，避免 generic 標籤或空泛概念。
 
 ### 4. Query Pipeline
 
@@ -374,6 +386,7 @@ Issues found: 3 orphan pages, 1 contradiction, 2 missing cross-references.
 | EC-15 | LLM 識別的關係型別不在預設清單也不在 schema 中 | Fallback 至 `related`，在 chat 顯示「使用 related 代替未知型別 X」 |
 | EC-16 | 反向連結更新時對象頁面不存在或被刪除 | 跳過反向連結更新，不建立新頁面 |
 | EC-17 | 頁面已有手動設定的 frontmatter 關係 | RelationshipWriter 執行合併（不覆蓋），只新增 LLM 識別的關係 |
+| EC-18 | 使用者切換過 API Key 顯示為明碼後關閉設定頁再重開 | 設定頁重新開啟時一律回到遮罩顯示（不保留明碼顯示狀態） |
 
 ---
 
@@ -424,6 +437,9 @@ Issues found: 3 orphan pages, 1 contradiction, 2 missing cross-references.
 - [ ] 切換 provider 後下一則訊息即使用新 provider
 - [ ] Custom provider 可設定 baseUrl
 - [ ] Plugin 正確偵測目前 model 是否支援 vision（用於掃描版 PDF fallback 判斷）
+- [ ] 設定頁為分區塊式 UI（至少含 Provider 與 Vault Folders 區塊標題），同區塊內顯示對應設定欄位
+- [ ] API Key 欄位預設為遮罩顯示，開啟設定頁時不以明碼呈現
+- [ ] API Key 欄位提供眼睛圖示切換（show/hide）且可來回切換
 
 ### AC-11 Session Summary
 - [ ] 點擊「Summarize Session」後 LLM 生成 summary 並存入 session.summary
@@ -512,6 +528,8 @@ Issues found: 3 orphan pages, 1 contradiction, 2 missing cross-references.
 
 - [ ] **T-01** 初始化 Obsidian plugin 專案（TypeScript + esbuild，參考官方 sample plugin）
 - [ ] **T-02** 實作 Plugin Settings Tab（provider、API key、model、baseUrl、路徑、systemPrompt、autoIngest、lintSchedule）
+- [ ] **T-02b** 設定頁 UI 分區塊化（Provider / Vault Folders / Schema / Ingest / Lint / Context）
+- [ ] **T-02c** API Key 欄位安全顯示：預設遮罩 + 眼睛圖示 show/hide 切換 + 重開設定頁回到遮罩
 - [ ] **T-03** 定義 `LLMProvider` 抽象介面（`chat(messages, options): AsyncGenerator<string>`）
 - [ ] **T-04** 實作 `OpenAIProvider`（含 streaming）
 - [ ] **T-05** 實作 `AnthropicProvider`（含 streaming）

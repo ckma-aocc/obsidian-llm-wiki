@@ -82106,37 +82106,56 @@ ${content}`,
             role: "user",
             content: [
               "Return valid JSON only.",
-              "The JSON must contain exactly two keys: entities and concepts.",
+              "The JSON must contain exactly two keys:",
+              "- entities",
+              "- concepts",
               "Each value must be an array of objects with:",
               "- title",
               "- content",
               "- tags",
-              "The goal is retrieval-oriented wiki generation.",
-              "Focus on reusable semantic concepts, technical entities, and retrieval precision.",
-              "Tags are for semantic retrieval and graph linking.",
-              "Do NOT generate broad topic labels or generic keywords.",
+              "You are generating semantic wiki knowledge nodes.",
+              "The goal is to compile the source into reusable retrieval-oriented wiki pages.",
+              "Entities and concepts have different purposes.",
+              "ENTITY DEFINITION:",
+              "Entities are named systems, services, APIs, components, middleware, protocols, SDKs, infrastructure elements, organizations, or products.",
+              "CONCEPT DEFINITION:",
+              "Concepts are technical ideas, mechanisms, workflows, behaviors, architectural patterns, abstractions, or implementation strategies.",
+              "Generate rich markdown wiki content.",
+              "Do NOT generate one-line summaries.",
+              "Each page should contain useful standalone knowledge.",
+              "Content should explain:",
+              "- what it is",
+              "- why it exists",
+              "- how it is used",
+              "- important behaviors",
+              "- constraints or caveats",
+              "- implementation or operational details when relevant",
+              "Use structured markdown sections when appropriate:",
+              "- Purpose",
+              "- Usage",
+              "- Behavior",
+              "- Requirements",
+              "- Notes",
+              "- Example",
+              "- Related",
+              "Use wikilinks for related concepts or entities when strongly relevant.",
               "Prefer canonical technical terminology.",
-              "Prefer noun phrases and explicit concepts.",
-              "Avoid vague tags such as:",
+              "Do not invent unsupported information.",
+              "Avoid generic explanations.",
+              "Avoid generic tags such as:",
               "- advanced",
               "- optimization",
               "- architecture",
               "- technology",
               "- important-concept",
-              "Tags should represent:",
-              "- entities",
-              "- technical concepts",
-              "- methods",
-              "- protocols",
-              "- systems",
-              "- tasks",
+              "Tags are for semantic retrieval and graph linking.",
+              "Tags must represent reusable technical concepts, systems, methods, protocols, or tasks.",
+              "Prefer noun phrases and explicit technical terminology.",
               "Each tags array should contain 3 to 5 highly reusable retrieval-oriented tags.",
-              "Use kebab-case.",
-              "Do not invent concepts not explicitly supported by the source.",
-              "Content should be concise markdown.",
-              "Use wikilinks only when strongly relevant.",
+              "Use kebab-case tags.",
               "Think about:",
               '"What future search queries should retrieve this page?"',
+              "Pages should resemble technical wiki knowledge nodes rather than summaries.",
               `Source title: ${sourceTitle}`,
               `Source summary:
 ${sourceSummary.slice(0, 6e3)}`,
@@ -82144,27 +82163,79 @@ ${sourceSummary.slice(0, 6e3)}`,
               JSON.stringify({
                 entities: [
                   {
-                    title: "FlashAttention",
-                    content: "Memory-efficient attention optimization for transformer inference.",
+                    title: "Account Middleware",
+                    content: `# Account Middleware
+
+            Account Middleware \u662F\u5E33\u865F\u4E2D\u53F0 API \u7684\u4E2D\u4ECB\u670D\u52D9\u5C64\uFF0C\u8CA0\u8CAC\u7D71\u4E00\u8655\u7406\u8EAB\u4EFD\u9A57\u8B49\u3001\u8ACB\u6C42\u8FFD\u8E64\u8207\u5E33\u865F\u76F8\u95DC\u6D41\u7A0B\u3002
+
+            ## Purpose
+
+            \u63D0\u4F9B\u96C6\u4E2D\u5F0F\u5E33\u865F\u670D\u52D9\u8207 API \u5B58\u53D6\u63A7\u5236\u3002
+
+            ## Responsibilities
+
+            - token validation
+            - request tracing
+            - session management
+            - authentication flow handling
+
+            ## Request Requirements
+
+            \u6240\u6709 API \u8ACB\u6C42\u9700\u5305\u542B [[X-Request-ID]] \u4EE5\u5229\u932F\u8AA4\u8FFD\u8E64\u3002
+
+            ## Related
+
+            - [[X-Request-ID]]
+            - [[Authentication Token]]
+            - [[Request Tracing]]`,
                     tags: [
-                      "flashattention",
-                      "transformer-inference",
-                      "attention-optimization",
-                      "cuda-kernel",
-                      "memory-bandwidth"
+                      "account-middleware",
+                      "authentication-service",
+                      "request-tracing",
+                      "api-gateway",
+                      "session-management"
                     ]
                   }
                 ],
                 concepts: [
                   {
-                    title: "KV Cache",
-                    content: "Technique for caching transformer key/value states during autoregressive decoding.",
+                    title: "X-Request-ID",
+                    content: `# X-Request-ID
+
+            X-Request-ID \u662F HTTP \u8ACB\u6C42\u8FFD\u8E64\u6A19\u982D\uFF0C\u7528\u65BC API request tracing \u8207\u554F\u984C\u6392\u67E5\u3002
+
+            ## Purpose
+
+            \u6BCF\u500B API \u8ACB\u6C42\u90FD\u61C9\u651C\u5E36\u552F\u4E00\u8B58\u5225\u503C\uFF0C
+            \u65B9\u4FBF\u65BC\u5206\u6563\u5F0F\u7CFB\u7D71\u8207\u4F3A\u670D\u5668\u65E5\u8A8C\u4E2D\u8FFD\u8E64\u8ACB\u6C42\u6D41\u7A0B\u3002
+
+            ## Usage
+
+            \`\`\`http
+            X-Request-ID: <random-id>
+            \`\`\`
+
+            ## Behavior
+
+            - \u6BCF\u6B21\u8ACB\u6C42\u61C9\u4F7F\u7528\u65B0\u7684\u552F\u4E00\u503C
+            - \u5E38\u7528\u65BC log correlation
+            - \u53EF\u5354\u52A9\u8DE8\u670D\u52D9\u8FFD\u8E64 request flow
+
+            ## Notes
+
+            \u5EFA\u8B70\u4F7F\u7528 UUID \u4F5C\u70BA request identifier\u3002
+
+            ## Related
+
+            - [[Request Tracing]]
+            - [[Correlation ID]]
+            - [[Distributed Logging]]`,
                     tags: [
-                      "kv-cache",
-                      "autoregressive-decoding",
-                      "transformer-inference",
-                      "token-generation",
-                      "attention-cache"
+                      "x-request-id",
+                      "request-tracing",
+                      "correlation-id",
+                      "http-header",
+                      "distributed-logging"
                     ]
                   }
                 ]
@@ -82594,12 +82665,17 @@ var LLMWikiSettingsTab = class extends import_obsidian.PluginSettingTab {
   display() {
     const { containerEl } = this;
     containerEl.empty();
+    containerEl.addClass("llm-wiki-settings-root");
+    containerEl.createEl("h2", {
+      text: "LLM Wiki Settings",
+      cls: "llm-wiki-settings-title"
+    });
     const isOpenAI = this.plugin.settings.provider === "openai";
     const isAnthropic = this.plugin.settings.provider === "anthropic";
     const isOllama = this.plugin.settings.provider === "ollama";
     const isGemini = this.plugin.settings.provider === "gemini";
     const activeConfig = resolveProviderConfig(this.plugin.settings);
-    const hint = containerEl.createEl("div", { cls: "setting-item-description" });
+    const hint = containerEl.createEl("div", { cls: "setting-item-description llm-wiki-settings-hint" });
     if (isOpenAI) {
       hint.setText(
         "OpenAI mode also supports Azure OpenAI. For Azure, set Base URL to your endpoint (or deployment URL), set API Key, and set Model to your deployment name. Settings are auto-saved."
@@ -82611,26 +82687,45 @@ var LLMWikiSettingsTab = class extends import_obsidian.PluginSettingTab {
     } else if (isGemini) {
       hint.setText("Gemini mode: set API Key from Google AI Studio (aistudio.google.com). Model defaults to gemini-2.0-flash. Base URL is optional (leave blank for default). Settings are auto-saved.");
     }
-    new import_obsidian.Setting(containerEl).setName("Provider").setDesc("OpenAI, Anthropic, Ollama, Gemini").addDropdown(
+    const providerSection = this.createSection(containerEl, "Provider", "Configure the LLM service used for all operations.");
+    new import_obsidian.Setting(providerSection).setName("Provider").setDesc("OpenAI, Anthropic, Ollama, Gemini").addDropdown(
       (d) => d.addOption("openai", "OpenAI").addOption("anthropic", "Anthropic").addOption("ollama", "Ollama").addOption("gemini", "Google Gemini").setValue(this.plugin.settings.provider).onChange(async (v) => {
         this.plugin.settings.provider = v;
         await this.plugin.saveSettings();
         this.display();
       })
     );
-    new import_obsidian.Setting(containerEl).setName("API Key").addText(
-      (t) => t.setValue(activeConfig.apiKey).onChange(async (v) => {
+    let showApiKey = false;
+    let apiKeyInputEl = null;
+    new import_obsidian.Setting(providerSection).setName("API Key").addText((t) => {
+      apiKeyInputEl = t.inputEl;
+      apiKeyInputEl.type = "password";
+      apiKeyInputEl.autocomplete = "off";
+      apiKeyInputEl.spellcheck = false;
+      t.setPlaceholder("sk-...").setValue(activeConfig.apiKey).onChange(async (v) => {
         upsertProviderConfig(this.plugin.settings, this.plugin.settings.provider, { apiKey: v.trim() });
         await this.plugin.saveSettings();
-      })
-    );
-    new import_obsidian.Setting(containerEl).setName("Model").addText(
+      });
+    }).addExtraButton((btn) => {
+      const applyMaskState = () => {
+        if (!apiKeyInputEl) return;
+        apiKeyInputEl.type = showApiKey ? "text" : "password";
+        btn.setIcon(showApiKey ? "eye-off" : "eye");
+        btn.setTooltip(showApiKey ? "Hide API key" : "Show API key");
+      };
+      btn.onClick(() => {
+        showApiKey = !showApiKey;
+        applyMaskState();
+      });
+      applyMaskState();
+    });
+    new import_obsidian.Setting(providerSection).setName("Model").addText(
       (t) => t.setValue(activeConfig.model).onChange(async (v) => {
         upsertProviderConfig(this.plugin.settings, this.plugin.settings.provider, { model: v.trim() });
         await this.plugin.saveSettings();
       })
     );
-    new import_obsidian.Setting(containerEl).setName("Base URL").setDesc(
+    new import_obsidian.Setting(providerSection).setName("Base URL").setDesc(
       isOpenAI ? "OpenAI: optional override. Azure OpenAI: endpoint or deployment URL." : isOllama ? "Ollama chat endpoint URL." : "Provider endpoint override (optional)."
     ).addText(
       (t) => t.setValue(activeConfig.baseUrl).onChange(async (v) => {
@@ -82639,7 +82734,7 @@ var LLMWikiSettingsTab = class extends import_obsidian.PluginSettingTab {
       })
     );
     if (isOpenAI) {
-      new import_obsidian.Setting(containerEl).setName("Azure OpenAI API Version").setDesc("Used when Base URL is an Azure OpenAI endpoint. Example: 2024-10-21").addText(
+      new import_obsidian.Setting(providerSection).setName("Azure OpenAI API Version").setDesc("Used when Base URL is an Azure OpenAI endpoint. Example: 2024-10-21").addText(
         (t) => t.setValue(activeConfig.azureApiVersion || "2024-10-21").onChange(async (v) => {
           upsertProviderConfig(this.plugin.settings, this.plugin.settings.provider, {
             azureApiVersion: v.trim() || "2024-10-21"
@@ -82648,55 +82743,59 @@ var LLMWikiSettingsTab = class extends import_obsidian.PluginSettingTab {
         })
       );
     }
-    new import_obsidian.Setting(containerEl).setName("Raw sources path").addText(
+    const vaultSection = this.createSection(containerEl, "Vault Folders", "Folders used for raw sources, generated wiki pages, and session storage.");
+    new import_obsidian.Setting(vaultSection).setName("Raw sources path").addText(
       (t) => t.setValue(this.plugin.settings.rawSourcesPath).onChange(async (v) => {
         this.plugin.settings.rawSourcesPath = v.trim() || "raw";
         await this.plugin.saveSettings();
       })
     );
-    new import_obsidian.Setting(containerEl).setName("Wiki path").addText(
+    new import_obsidian.Setting(vaultSection).setName("Wiki path").addText(
       (t) => t.setValue(this.plugin.settings.wikiPath).onChange(async (v) => {
         this.plugin.settings.wikiPath = v.trim() || "wiki";
         await this.plugin.saveSettings();
       })
     );
-    new import_obsidian.Setting(containerEl).setName("Sessions path").addText(
+    new import_obsidian.Setting(vaultSection).setName("Sessions path").addText(
       (t) => t.setValue(this.plugin.settings.sessionsPath).onChange(async (v) => {
         this.plugin.settings.sessionsPath = v.trim() || ".llm-wiki/sessions";
         await this.plugin.saveSettings();
       })
     );
-    new import_obsidian.Setting(containerEl).setName("Use WIKI_SCHEMA.md").addToggle(
+    const schemaSection = this.createSection(containerEl, "Schema & Relations", "Control wiki schema loading and relation type overrides.");
+    new import_obsidian.Setting(schemaSection).setName("Use WIKI_SCHEMA.md").addToggle(
       (toggle) => toggle.setValue(this.plugin.settings.useWikiSchemaFile).onChange(async (v) => {
         this.plugin.settings.useWikiSchemaFile = v;
         await this.plugin.saveSettings();
       })
     );
-    new import_obsidian.Setting(containerEl).setName("System prompt override").addText(
+    new import_obsidian.Setting(schemaSection).setName("System prompt override").addText(
       (t) => t.setValue(this.plugin.settings.systemPrompt).onChange(async (v) => {
         this.plugin.settings.systemPrompt = v;
         await this.plugin.saveSettings();
       })
     );
-    new import_obsidian.Setting(containerEl).setName("Relation types override (comma separated)").addText(
+    new import_obsidian.Setting(schemaSection).setName("Relation types override (comma separated)").addText(
       (t) => t.setValue(this.plugin.settings.relationTypesOverride).onChange(async (v) => {
         this.plugin.settings.relationTypesOverride = v;
         await this.plugin.saveSettings();
       })
     );
-    new import_obsidian.Setting(containerEl).setName("Auto ingest").addToggle(
+    const ingestSection = this.createSection(containerEl, "Ingest", "Configure automatic ingestion behavior and source monitoring.");
+    new import_obsidian.Setting(ingestSection).setName("Auto ingest").addToggle(
       (toggle) => toggle.setValue(this.plugin.settings.autoIngest).onChange(async (v) => {
         this.plugin.settings.autoIngest = v;
         await this.plugin.saveSettings();
       })
     );
-    new import_obsidian.Setting(containerEl).setName("Lint schedule").addDropdown(
+    const lintSection = this.createSection(containerEl, "Lint", "Set the schedule and catch-up behavior for wiki health checks.");
+    new import_obsidian.Setting(lintSection).setName("Lint schedule").addDropdown(
       (d) => d.addOption("off", "Off").addOption("daily", "Daily").addOption("weekly", "Weekly").setValue(this.plugin.settings.lintSchedule).onChange(async (v) => {
         this.plugin.settings.lintSchedule = v;
         await this.plugin.saveSettings();
       })
     );
-    new import_obsidian.Setting(containerEl).setName("Lint time (HH:mm)").setDesc("Used for Daily/Weekly schedules. Example: 09:00").addText(
+    new import_obsidian.Setting(lintSection).setName("Lint time (HH:mm)").setDesc("Used for Daily/Weekly schedules. Example: 09:00").addText(
       (t) => t.setValue(this.plugin.settings.lintTimeOfDay).onChange(async (v) => {
         const raw = v.trim();
         const valid = /^([01]\d|2[0-3]):([0-5]\d)$/.test(raw);
@@ -82704,19 +82803,26 @@ var LLMWikiSettingsTab = class extends import_obsidian.PluginSettingTab {
         await this.plugin.saveSettings();
       })
     );
-    new import_obsidian.Setting(containerEl).setName("Catch up missed lint on startup").setDesc("If enabled, run one lint at startup when a scheduled run was missed while Obsidian was closed.").addToggle(
+    new import_obsidian.Setting(lintSection).setName("Catch up missed lint on startup").setDesc("If enabled, run one lint at startup when a scheduled run was missed while Obsidian was closed.").addToggle(
       (toggle) => toggle.setValue(this.plugin.settings.lintCatchUpOnStartup).onChange(async (v) => {
         this.plugin.settings.lintCatchUpOnStartup = v;
         await this.plugin.saveSettings();
       })
     );
-    new import_obsidian.Setting(containerEl).setName("Context window size").addText(
+    const contextSection = this.createSection(containerEl, "Context", "Tune how much conversation history is sent to the LLM.");
+    new import_obsidian.Setting(contextSection).setName("Context window size").addText(
       (t) => t.setValue(String(this.plugin.settings.contextWindowSize)).onChange(async (v) => {
         const num = Number(v);
         this.plugin.settings.contextWindowSize = Number.isFinite(num) && num > 0 ? num : 20;
         await this.plugin.saveSettings();
       })
     );
+  }
+  createSection(containerEl, title, description) {
+    const section = containerEl.createDiv({ cls: "llm-wiki-settings-section" });
+    section.createEl("h3", { text: title, cls: "llm-wiki-settings-section-title" });
+    section.createEl("div", { text: description, cls: "setting-item-description llm-wiki-settings-section-desc" });
+    return section;
   }
 };
 

@@ -46,6 +46,9 @@ export class Setting {
   addToggle() {
     return this;
   }
+  addExtraButton() {
+    return this;
+  }
 }
 
 export class Notice {

@@ -7,6 +7,8 @@
 - Log observability is expanded with `/log-tail` and `/log-filter` for in-chat operational tracing.
 - Slash command surface has been polished to include cleanup and index maintenance flows (`/clean-links`, `/reindex`).
 - UI/interaction polish includes selectable rendered text, markdown rendering fixes, and session UX refinements.
+- Settings UI polish now includes sectioned categories (Provider, Vault Folders, Schema/Relations, Ingest, Lint, Context) for faster settings navigation.
+- API Key settings input is masked by default with an eye-toggle show/hide control, and resets to masked mode whenever the settings page is reopened.
 - Assistant markdown message spacing is tuned to a compact layout: assistant uses normal whitespace and tighter paragraph/list margins, while user messages keep `pre-wrap` to preserve manual line breaks.
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.

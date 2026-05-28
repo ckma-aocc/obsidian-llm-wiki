@@ -13,6 +13,12 @@ export class LLMWikiSettingsTab extends PluginSettingTab {
   display(): void {
     const { containerEl } = this;
     containerEl.empty();
+    containerEl.addClass("llm-wiki-settings-root");
+
+    containerEl.createEl("h2", {
+      text: "LLM Wiki Settings",
+      cls: "llm-wiki-settings-title"
+    });
 
     const isOpenAI = this.plugin.settings.provider === "openai";
     const isAnthropic = this.plugin.settings.provider === "anthropic";
@@ -20,7 +26,7 @@ export class LLMWikiSettingsTab extends PluginSettingTab {
     const isGemini = this.plugin.settings.provider === "gemini";
     const activeConfig = resolveProviderConfig(this.plugin.settings);
 
-    const hint = containerEl.createEl("div", { cls: "setting-item-description" });
+    const hint = containerEl.createEl("div", { cls: "setting-item-description llm-wiki-settings-hint" });
     if (isOpenAI) {
       hint.setText(
         "OpenAI mode also supports Azure OpenAI. For Azure, set Base URL to your endpoint (or deployment URL), set API Key, and set Model to your deployment name. Settings are auto-saved."
@@ -33,7 +39,9 @@ export class LLMWikiSettingsTab extends PluginSettingTab {
       hint.setText("Gemini mode: set API Key from Google AI Studio (aistudio.google.com). Model defaults to gemini-2.0-flash. Base URL is optional (leave blank for default). Settings are auto-saved.");
     }
 
-    new Setting(containerEl)
+    const providerSection = this.createSection(containerEl, "Provider", "Configure the LLM service used for all operations.");
+
+    new Setting(providerSection)
       .setName("Provider")
       .setDesc("OpenAI, Anthropic, Ollama, Gemini")
       .addDropdown((d) =>
@@ -50,16 +58,39 @@ export class LLMWikiSettingsTab extends PluginSettingTab {
           })
       );
 
-    new Setting(containerEl)
+    let showApiKey = false;
+    let apiKeyInputEl: HTMLInputElement | null = null;
+
+    new Setting(providerSection)
       .setName("API Key")
-      .addText((t) =>
-        t.setValue(activeConfig.apiKey).onChange(async (v) => {
+      .addText((t) => {
+        apiKeyInputEl = t.inputEl;
+        apiKeyInputEl.type = "password";
+        apiKeyInputEl.autocomplete = "off";
+        apiKeyInputEl.spellcheck = false;
+
+        t.setPlaceholder("sk-...").setValue(activeConfig.apiKey).onChange(async (v) => {
           upsertProviderConfig(this.plugin.settings, this.plugin.settings.provider, { apiKey: v.trim() });
           await this.plugin.saveSettings();
-        })
-      );
+        });
+      })
+      .addExtraButton((btn) => {
+        const applyMaskState = () => {
+          if (!apiKeyInputEl) return;
+          apiKeyInputEl.type = showApiKey ? "text" : "password";
+          btn.setIcon(showApiKey ? "eye-off" : "eye");
+          btn.setTooltip(showApiKey ? "Hide API key" : "Show API key");
+        };
 
-    new Setting(containerEl)
+        btn.onClick(() => {
+          showApiKey = !showApiKey;
+          applyMaskState();
+        });
+
+        applyMaskState();
+      });
+
+    new Setting(providerSection)
       .setName("Model")
       .addText((t) =>
         t.setValue(activeConfig.model).onChange(async (v) => {
@@ -68,7 +99,7 @@ export class LLMWikiSettingsTab extends PluginSettingTab {
         })
       );
 
-    new Setting(containerEl)
+    new Setting(providerSection)
       .setName("Base URL")
       .setDesc(
         isOpenAI
@@ -85,7 +116,7 @@ export class LLMWikiSettingsTab extends PluginSettingTab {
       );
 
     if (isOpenAI) {
-      new Setting(containerEl)
+      new Setting(providerSection)
         .setName("Azure OpenAI API Version")
         .setDesc("Used when Base URL is an Azure OpenAI endpoint. Example: 2024-10-21")
         .addText((t) =>
@@ -98,7 +129,9 @@ export class LLMWikiSettingsTab extends PluginSettingTab {
         );
     }
 
-    new Setting(containerEl)
+    const vaultSection = this.createSection(containerEl, "Vault Folders", "Folders used for raw sources, generated wiki pages, and session storage.");
+
+    new Setting(vaultSection)
       .setName("Raw sources path")
       .addText((t) =>
         t.setValue(this.plugin.settings.rawSourcesPath).onChange(async (v) => {
@@ -107,7 +140,7 @@ export class LLMWikiSettingsTab extends PluginSettingTab {
         })
       );
 
-    new Setting(containerEl)
+    new Setting(vaultSection)
       .setName("Wiki path")
       .addText((t) =>
         t.setValue(this.plugin.settings.wikiPath).onChange(async (v) => {
@@ -116,7 +149,7 @@ export class LLMWikiSettingsTab extends PluginSettingTab {
         })
       );
 
-    new Setting(containerEl)
+    new Setting(vaultSection)
       .setName("Sessions path")
       .addText((t) =>
         t.setValue(this.plugin.settings.sessionsPath).onChange(async (v) => {
@@ -125,7 +158,9 @@ export class LLMWikiSettingsTab extends PluginSettingTab {
         })
       );
 
-    new Setting(containerEl)
+    const schemaSection = this.createSection(containerEl, "Schema & Relations", "Control wiki schema loading and relation type overrides.");
+
+    new Setting(schemaSection)
       .setName("Use WIKI_SCHEMA.md")
       .addToggle((toggle) =>
         toggle.setValue(this.plugin.settings.useWikiSchemaFile).onChange(async (v) => {
@@ -134,7 +169,7 @@ export class LLMWikiSettingsTab extends PluginSettingTab {
         })
       );
 
-    new Setting(containerEl)
+    new Setting(schemaSection)
       .setName("System prompt override")
       .addText((t) =>
         t.setValue(this.plugin.settings.systemPrompt).onChange(async (v) => {
@@ -143,7 +178,7 @@ export class LLMWikiSettingsTab extends PluginSettingTab {
         })
       );
 
-    new Setting(containerEl)
+    new Setting(schemaSection)
       .setName("Relation types override (comma separated)")
       .addText((t) =>
         t.setValue(this.plugin.settings.relationTypesOverride).onChange(async (v) => {
@@ -152,7 +187,9 @@ export class LLMWikiSettingsTab extends PluginSettingTab {
         })
       );
 
-    new Setting(containerEl)
+    const ingestSection = this.createSection(containerEl, "Ingest", "Configure automatic ingestion behavior and source monitoring.");
+
+    new Setting(ingestSection)
       .setName("Auto ingest")
       .addToggle((toggle) =>
         toggle.setValue(this.plugin.settings.autoIngest).onChange(async (v) => {
@@ -161,7 +198,9 @@ export class LLMWikiSettingsTab extends PluginSettingTab {
         })
       );
 
-    new Setting(containerEl)
+    const lintSection = this.createSection(containerEl, "Lint", "Set the schedule and catch-up behavior for wiki health checks.");
+
+    new Setting(lintSection)
       .setName("Lint schedule")
       .addDropdown((d) =>
         d
@@ -175,7 +214,7 @@ export class LLMWikiSettingsTab extends PluginSettingTab {
           })
       );
 
-    new Setting(containerEl)
+    new Setting(lintSection)
       .setName("Lint time (HH:mm)")
       .setDesc("Used for Daily/Weekly schedules. Example: 09:00")
       .addText((t) =>
@@ -187,7 +226,7 @@ export class LLMWikiSettingsTab extends PluginSettingTab {
         })
       );
 
-    new Setting(containerEl)
+    new Setting(lintSection)
       .setName("Catch up missed lint on startup")
       .setDesc("If enabled, run one lint at startup when a scheduled run was missed while Obsidian was closed.")
       .addToggle((toggle) =>
@@ -197,7 +236,9 @@ export class LLMWikiSettingsTab extends PluginSettingTab {
         })
       );
 
-    new Setting(containerEl)
+    const contextSection = this.createSection(containerEl, "Context", "Tune how much conversation history is sent to the LLM.");
+
+    new Setting(contextSection)
       .setName("Context window size")
       .addText((t) =>
         t.setValue(String(this.plugin.settings.contextWindowSize)).onChange(async (v) => {
@@ -206,5 +247,12 @@ export class LLMWikiSettingsTab extends PluginSettingTab {
           await this.plugin.saveSettings();
         })
       );
+  }
+
+  private createSection(containerEl: HTMLElement, title: string, description: string): HTMLElement {
+    const section = containerEl.createDiv({ cls: "llm-wiki-settings-section" });
+    section.createEl("h3", { text: title, cls: "llm-wiki-settings-section-title" });
+    section.createEl("div", { text: description, cls: "setting-item-description llm-wiki-settings-section-desc" });
+    return section;
   }
 }
